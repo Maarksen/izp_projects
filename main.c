@@ -8,12 +8,14 @@
 #define MIN_PARAM 1             //hodnota argumentu param musi vzdy byt nezaporna a vacsia ako 0
 #define PARAM_3 3               //argument 'param' v hodnote 3
 #define PARAM_4 4               //argument 'param' v hodnote 4
-#define ASCII 126                   //pocet vsetkych znakov v ascii tabulke
-#define RIGHT_STATS_LENGTH 7        //jedina spravna dlzka 4. parametru
-#define STERTER_MIN 100             //konstanta ktora vyjadruje zaciatocnu hodnotu minimalnej dlzky passwords, od ktorej odpocitavame
-#define MAX_PASSWORD_LENGTH 101     //maximalna dlzka ktoru heslo moze mat
+#define LEVEL_2 2                   //argument 'level' v hodnote 2
 #define LEVEL_3 3                   //argument 'level' v hodnote 3
 #define LEVEL_4 4                   //argument 'level' v hodnote 4
+#define RIGHT_STATS_LENGTH 7        //jedina spravna dlzka 4. parametru
+#define ASCII 126                   //pocet vsetkych znakov v ascii tabulke
+#define STERTER_MIN 100             //konstanta ktora vyjadruje zaciatocnu hodnotu minimalnej dlzky passwords, od ktorej odpocitavame
+#define MAX_PASSWORD_LENGTH 101     //maximalna dlzka ktoru heslo moze mat
+
 
 //prototypy funkcii na kontrolu argumentov
 bool enough_arguments(int argc);
@@ -144,11 +146,11 @@ int strlength(char *string){
 
 //funkcia kontroluje či je parameter 'param' spravne zadany
 bool is_param_correct(long long param){
-    if(param >= MIN_PARAM){
+    if(param >= MIN_PARAM){                 //arguemnt param musi byt vacsi alebo rovny 1
         return true;
     }
     else{
-        fprintf(stderr,"argument 'param' has to be >1");
+        fprintf(stderr,"argument 'param' has to be >= 1");
         return false;
     }
 }
@@ -206,7 +208,7 @@ int num_of_characters_password(char *passwords, unsigned passwords_sum, unsigned
         password_length++;
         passwords_sum++;
     }
-    passwords_count++;                      //po kazdom zavolani funkcie 1 k poctu hesiel
+    passwords_count++;                      //po kazdom zavolani funkcie +1 k poctu hesiel
     return password_length;
 }
 
@@ -272,16 +274,16 @@ int num_of_unique_chars(char *passwords, char *unique_chars, unsigned unique_cha
                 break;
             }
         }
-            if (found == false) {
-                unique_chars_count++;                               //pripocita +1 k roznym charakterom
-                unique_chars[unique_chars_count] = passwords[i];    //pripise znak do pola s charaktermi ktore sme uz presli 
-            }
+        if(found == false) {
+            unique_chars_count++;                               //pripocita +1 k roznym charakterom
+            unique_chars[unique_chars_count] = passwords[i];    //pripise znak do pola s charaktermi ktore sme uz presli 
         }
+    }
 
     return unique_chars_count;
 }
 
-//funkcia ktora kontroluje ci sa opakuje X znakov po sebe
+//funkcia, ktora kontroluje ci sa opakuje X znakov po sebe
 bool sequence_of_chars(char *passwords, long long param){
     for(int i = 0; passwords[i] != '\0'; i++){
         if((passwords[i] == passwords[i+1]) && param == 2){         //pre zadany parameter 2 nemusi ani prechadzat cyklom ak najde 2 rovnake charaktery po sebe
@@ -301,7 +303,7 @@ bool sequence_of_chars(char *passwords, long long param){
     return true;
 }
 
-//funkcia ktora hlada dva rovnake podretazce aspon dlzky X
+//funkcia, ktora hlada dva rovnake podretazce aspon dlzky X
 bool substring_of_chars(char *passwords, long long param, unsigned password_length){
     for(unsigned int i = 0; passwords[i] != '\0'; i++){
         for(unsigned int j = 0; j < password_length; j++){              //pre kazdy znak hesla prechadza kazdym znakom toho isteho hesla
@@ -320,23 +322,26 @@ bool substring_of_chars(char *passwords, long long param, unsigned password_leng
     return true;
 }
 
-//funkcia ktora zavola funkcie na kontrolu hesiel
+//funkcia, ktora zavola funkcie na kontrolu hesiel
 void final_password(char *passwords, long long param, unsigned level, unsigned password_length){
+
+    if(level == LEVEL_2 && param > PARAM_4){
+        param = PARAM_4;
+    }
+
     if(containsuppercase(passwords) == false){
         }
     else if(containslowercase(passwords) == false){
         }
-    else if(level >= 2 && param == PARAM_3 && checking_for_param(passwords) == false){
+    else if(level >= LEVEL_2 && param == PARAM_3 && checking_for_param(passwords) == false){
         }
-    else if(level >= 2 && param == PARAM_4 && containsnumber(passwords) == false){
+    else if(level >= LEVEL_2 && param == PARAM_4 && containsnumber(passwords) == false){
         }
-    else if(level >= 2 && param == PARAM_4 && containssymbol(passwords) == false){
-        }
-    else if(param > PARAM_4){
+    else if(level >= LEVEL_2 && param == PARAM_4 && containssymbol(passwords) == false){
         }
     else if((level == LEVEL_3 || level == LEVEL_4) && sequence_of_chars(passwords, param) == false){
         }
-    else if(level > 2 && param == 1){
+    else if(level > LEVEL_2 && param == 1){
         }
     else if(level == LEVEL_4 && substring_of_chars(passwords, param, password_length) == false){
         }
@@ -345,7 +350,7 @@ void final_password(char *passwords, long long param, unsigned level, unsigned p
         }
 }
 
-//funkcia ktora vypisuje statistiky
+//funkcia, ktora vypisuje statistiky
 void statistics(unsigned unique_chars_count, unsigned min_length, double average_length){
     printf("Statistika:\n");
     printf("Ruznych znaku: %d\n", unique_chars_count-1);
